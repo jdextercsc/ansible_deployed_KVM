@@ -1,0 +1,11 @@
+---
+
+- name: install kvm
+  yum:
+    state: present
+    name: "@virt"
+  tags: kvm
+
+- 
+
+#assume that network intefaces have bridges made for them.

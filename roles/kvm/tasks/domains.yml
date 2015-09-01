@@ -1,0 +1,49 @@
+---
+
+  - name: create with backing file
+    command: qemu-img create -f qcow2 -b {{ base_image }} "{{ instance_path }}/{{ item }}.qcow2"
+    with_sequence: start=1 end={{ quantity }} format="{{ name_prefix }}%d"
+
+  - name: create domain xml
+    local_action: template src=domain.xml.j2 dest="/home/jcallen/Development/create-thin-linked-vm/{{ item }}.xml"
+    with_sequence: start=1 end={{ quantity }} format="{{ name_prefix }}%d"
+    register: domain_xml
+
+  - name: sysprep
+    command: virt-sysprep --hostname {{ item['item'] }} -a "{{ instance_path}}/{{ item['item'] }}.qcow2"
+    with_items: domain_xml.results
+
+  - name: define domain
+    virt:
+      name: item.item
+      command: define
+      xml: "{{ lookup('file', item['dest']) }}"
+    with_items: domain_xml.results
+
+  - name: remove domain xml
+    local_action: file state=absent path="{{ item['dest'] }}"
+    with_items: domain_xml.results
+
+  - name: start domain
+    virt:
+      name: "{{ item['item'] }}"
+      command: start
+    with_items: domain_xml.results
+
+  - pause:
+      seconds: 30
+
+  - name: retrieve ip address
+    virt_ipaddress:
+      name: "{{ item['item'] }}"
+      device: "eth0"
+    register: virsh_result
+    with_items: domain_xml.results
+
+  - debug:
+      msg: "{{ item['ansible_virt_ipv4'] }}"
+    with_items: virsh_result.results
+  
+
+
+# vim:ft=ansible:

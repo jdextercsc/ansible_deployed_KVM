@@ -1,0 +1,61 @@
+---
+- name: copy and load 99-sysctl.conf
+  copy: src=99-sysctl.conf dest=/etc/sysctl.d/99-sysctl.conf owner=root group=root mode=0644 force
+  tags: sysctl
+
+- name: reload the sysctl file
+  command: sysctl -p /etc/sysctl.d/99-sysctl.conf
+  tags: sysctl
+
+- name: deploy resolv.conf
+  template: src=resolv.conf.j2 dest=/etc/resolv.conf
+  tags: dns
+
+- name: create /etc/hosts with all nodes
+  tags: dns
+  lineinfile: dest=/etc/hosts regexp='.*{{ item }}$' line="{{ hostvars[item].int_if.ipaddr }} {{item}}" state=present
+  when: hostvars[item].int_if.ipaddr is defined
+  with_items: groups['all']
+
+- include: "RedHat-rpms.yml"
+  when: ansible_os_family == "RedHat"
+  tags: common
+
+# This is handeld in Wiley
+#- name: enable ssh key-based access
+#  authorized_key: user=root key="{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+#  register: result
+#  tags: sshkey
+
+#- name: restore selinux context of .ssh files
+#  command: restorecon -R -v /root/.ssh
+#  when: result.changed
+#  tags: sshkey
+
+- name: set selinux policy and mode
+  selinux: policy=targeted state=permissive
+  tags: selinux
+
+- name: install ntp
+  yum: pkg=ntp state=installed
+  tags: ntp
+
+- name: configure ntp service
+  template: src=ntp.conf.j2 dest=/etc/ntp.conf force=yes
+  #notify:
+  #  - restart ntpd
+  tags: ntp
+
+- name: stop ntpd service to prepare for time synchronization
+  service: name=ntpd state=stopped
+  when: force_ntpdate == "yes"
+  tags: ntp
+
+- name: sync time from ntp servers
+  command: ntpdate {{ ntp | join(" ") }}
+  when: force_ntpdate == "yes"
+  tags: ntp
+
+- name: Set hostname
+  command: hostnamectl set-hostname --static --transient {{ inventory_hostname }}
+  tags: dns

@@ -1,0 +1,9 @@
+---
+- include:
+    - network.yml
+    - storage.yml
+    - domain.yml
+
+
+
+# vim:ft=ansible:

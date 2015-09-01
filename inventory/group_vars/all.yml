@@ -1,0 +1,6 @@
+---
+instance_path: /instances
+base_image: "{{ instance_path }}/rhel.qcow2"
+quantity: 2 
+cleanup: true
+name_prefix: rhelops

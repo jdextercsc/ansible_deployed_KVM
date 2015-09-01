@@ -1,0 +1,5 @@
+127.0.0.1 localhost
+{% for host in groups.all %}
+#{{ hostvars[host].ansible_em3.address }}   {{ host }}.lordbusiness {{host}}
+{{ hostvars[inventory_hostname].int_if.ipaddr }}  {{ host }}.lordbusiness {{ host }}
+{%  endfor %}

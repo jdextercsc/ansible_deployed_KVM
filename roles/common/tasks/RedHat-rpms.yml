@@ -1,0 +1,19 @@
+---
+- name: install base rpms
+  yum: name={{ item }} state=present
+  with_items:
+    - libselinux-python
+    - openssh-clients
+    - ntp
+    - bind-utils
+    - openstack-utils
+    - vim
+
+# this is needed to track changes using openstack-config
+- name: add epel repo
+  copy: src=epel.repo dest=/etc/yum.repos.d/epel.repo
+  tags: crudini_update
+
+- name: update crudini
+  yum: name=crudini state=latest disable_gpg_check=yes enablerepo=epel
+  tags: crudini_update
