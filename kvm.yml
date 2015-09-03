@@ -1,0 +1,77 @@
+---
+- name: Controller Interface Configuration
+  hosts: kvmhost
+  max_fail_percentage: 0
+  roles:
+#    - common
+    - role: iface
+      device: p4p2
+      params:
+        type: '"Ethernet"'
+        bootproto: '"none"'
+        onboot: '"yes"'
+        peerdns: '"no"'
+        bridge: '"br0"'
+        mtu: '"9000"'
+
+#    - role: iface
+#      device: p3p2
+#      params:
+#        type: Ethernet
+#        bootproto: none
+#        onboot: '"yes"'
+#        peerdns: '"no"'
+#        bridge:'"br-vnic2"'
+#        mtu: 9000
+
+
+#    - role: iface
+#      device: em1
+#      params:
+#        type: '"Ethernet"'
+#        bootproto: '"none"'
+#        onboot: '"yes"'
+#        peerdns: '"no"'
+#        bridge: '"br-pxe"'
+
+    - role: iface
+      device: br0
+      params:
+        type: '"bridge"'
+#        ipaddr: "{{['ansible_p4p2.212']['ipv4']['address']}}"
+#        netmask: "{{['ansible_p4p2']['ipv4']['netmask']}}"
+        onboot: '"yes"'
+        peerdns: '"no"'
+        bootproto: '"static"'
+
+    - role: iface
+      device: br0.212
+      params:
+        type: '"ethernet"'
+        ipaddr: "{{['ansible_p4p2.212']['ipv4']['address']}}"
+        netmask: "{{['ansible_p4p2']['ipv4']['netmask']}}"
+        onboot: '"yes"'
+        peerdns: '"no"'
+        bootproto: '"static"'
+
+
+  #  - role: iface
+  #    device: br-pxe
+  #    params:
+ #       type: '"bridge"'
+ #       ipaddr: "{{['ansible_em1']['ipv4']['address']}}"
+#        netmask: "{{['ansible_em1']['ipv4']['netmask']}}"
+#        onboot: '"yes"'
+#        peerdns: '"no"'
+#        bootproto: '"static"'
+
+
+- name: Controller OpenStack Installation
+  hosts: kvmhost 
+  max_fail_percentage: 0
+  roles:
+    - subscription-manager
+    - common
+#    - kvm
+
+# vim:ft=ansible: 

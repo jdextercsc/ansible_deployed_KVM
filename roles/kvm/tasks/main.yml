@@ -3,9 +3,13 @@
 - name: install kvm
   yum:
     state: present
-    name: "@virt"
+    name: {{item}}
+  with_items:
+    - @virt
+    - bridge-utils
+    - net-tools
   tags: kvm
 
-- 
+ 
 
 #assume that network intefaces have bridges made for them.

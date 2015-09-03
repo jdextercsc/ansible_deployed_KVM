@@ -1,11 +1,17 @@
 ---
-- name: copy and load 99-sysctl.conf
-  copy: src=99-sysctl.conf dest=/etc/sysctl.d/99-sysctl.conf owner=root group=root mode=0644 force
-  tags: sysctl
+#- name: copy and load 99-sysctl.conf
+#  copy: src=99-sysctl.conf dest=/etc/sysctl.d/99-sysctl.conf owner=root group=root mode=0644 force
+#  tags: sysctl
 
-- name: reload the sysctl file
-  command: sysctl -p /etc/sysctl.d/99-sysctl.conf
-  tags: sysctl
+#- name: reload the sysctl file
+#  command: sysctl -p /etc/sysctl.d/99-sysctl.conf
+#  tags: sysctl
+
+- name: disable NetworkManager
+  service: name=NetworkManager state=stopped enabled=no
+  
+- name: start network
+  service: name=network state=stopped enabled=no
 
 - name: deploy resolv.conf
   template: src=resolv.conf.j2 dest=/etc/resolv.conf

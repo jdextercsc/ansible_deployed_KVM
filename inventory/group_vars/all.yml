@@ -4,3 +4,14 @@ base_image: "{{ instance_path }}/rhel.qcow2"
 quantity: 2 
 cleanup: true
 name_prefix: rhelops
+
+
+search_domain: novalocal
+nameservers:
+  - 172.17.10.22
+  - 192.168.70.3
+
+ntp:
+  - 0.rhel.pool.ntp.org
+  - 1.rhel.pool.ntp.org
+  - 2.rhel.pool.ntp.org
