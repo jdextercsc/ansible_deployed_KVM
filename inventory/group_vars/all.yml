@@ -1,9 +1,13 @@
 ---
 instance_path: /instances
 base_image: "{{ instance_path }}/rhel.qcow2"
-quantity: 2 
+quantity: 2
 cleanup: true
 name_prefix: rhelops
+
+rhn_user: "jeff.dexter@servicemesh.com"
+rhn_pass: "wolf359"
+pool: "8a85f9814f420cc1014f4271080b5975"
 
 
 search_domain: novalocal

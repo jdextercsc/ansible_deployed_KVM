@@ -9,9 +9,9 @@
 
 - name: disable NetworkManager
   service: name=NetworkManager state=stopped enabled=no
-  
-- name: start network
-  service: name=network state=stopped enabled=no
+
+#- name: start network
+  #service: name=network state=started enabled=yes
 
 - name: deploy resolv.conf
   template: src=resolv.conf.j2 dest=/etc/resolv.conf
@@ -23,20 +23,28 @@
   when: hostvars[item].int_if.ipaddr is defined
   with_items: groups['all']
 
-- include: "RedHat-rpms.yml"
-  when: ansible_os_family == "RedHat"
-  tags: common
+- name: install kvm
+  yum:
+    state: present
+    name: "{{item}}"
+  with_items:
+    - libvirt-daemon-kvm
+    - qemu-kvm
+    - libvirt
+    - libguestfs
+    - virt-install
+    - "bridge-utils"
+    - "net-tools"
+  tags: kvm
 
-# This is handeld in Wiley
-#- name: enable ssh key-based access
-#  authorized_key: user=root key="{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
-#  register: result
-#  tags: sshkey
-
-#- name: restore selinux context of .ssh files
-#  command: restorecon -R -v /root/.ssh
-#  when: result.changed
-#  tags: sshkey
+- name: install base rpms
+  yum: name={{ item }} state=present
+  with_items:
+    - libselinux-python
+    - openssh-clients
+    - ntp
+    - bind-utils
+    - vim
 
 - name: set selinux policy and mode
   selinux: policy=targeted state=permissive

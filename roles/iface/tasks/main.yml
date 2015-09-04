@@ -1,9 +1,18 @@
 ---
+- name: remove existing config file
+  file:
+    state: absent
+    path: /etc/sysconfig/network-scripts/ifcfg-{{ device }}
+
+
 - name: deploy network interface config file
-  template: src=ifcfg-dev.j2 dest=/etc/sysconfig/network-scripts/ifcfg-{{ device }}
+  template:
+    src: ifcfg-dev.j2
+    dest: /etc/sysconfig/network-scripts/ifcfg-{{ device }}
+    force: yes
   tags: iface
 
 - name: bring up deployed interface
   shell: ifdown {{ device }} && ifup {{ device }}
   tags: iface
-  #ignore_errors: yes
+  ignore_errors: yes

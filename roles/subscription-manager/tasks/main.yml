@@ -4,34 +4,20 @@
     state: present
     username: "{{ rhn_user }}"
     password: "{{ rhn_pass }}"
-    pool: "{{ pool }}"
+#    pool: "{{ pool }}"
   tags: sub-mgr
 
-- name: enable repos for juno
+- name: subscribe to pool
+  command: subscription-manager attach --pool={{pool}}
+  register: result
+  changed_when: result.stdout.find('enabled') != -1
+  failed_when: '"This unit has already had the subscription matching pool ID" not in result.stdout'
+
+
+- name: enable repos
   shell: "subscription-manager repos --list-enabled | grep 'Repo ID:   {{ item }}' || subscription-manager repos --enable={{ item }}"
   with_items:
     - rhel-7-server-rpms
-    - rhel-7-server-openstack-6.0-rpms
-    - rhel-server-rhscl-7-rpms
-    - rhel-ha-for-rhel-7-server-rpms
-    - rhel-7-server-optional-rpms
   register: result
   changed_when: result.stdout.find('enabled') != -1
   tags: sub-mgr
-  when: openstack_release == 'juno'
-
-
-- name: enable repos for kilo
-  shell: "subscription-manager repos --list-enabled | grep 'Repo ID:   {{ item }}' || subscription-manager repos --enable={{ item }}"
-  with_items:
-    - rhel-7-server-rpms
-    - rhel-7-server-openstack-7.0-rpms
-    - rhel-server-rhscl-7-rpms
-    - rhel-ha-for-rhel-7-server-rpms
-    - rhel-7-server-optional-rpms
-    - rhel7-server-openstack-7.0-optools-rpms
-    - rhel-7-server-openstack-7.0-files
-  register: result
-  changed_when: result.stdout.find('enabled') != -1
-  tags: sub-mgr
-  when: openstack_release == 'kilo'

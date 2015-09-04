@@ -1,13 +1,5 @@
 ---
-- name: install base rpms
-  yum: name={{ item }} state=present
-  with_items:
-    - libselinux-python
-    - openssh-clients
-    - ntp
-    - bind-utils
-    - openstack-utils
-    - vim
+
 
 # this is needed to track changes using openstack-config
 - name: add epel repo
