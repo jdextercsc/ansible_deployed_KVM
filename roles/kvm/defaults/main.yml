@@ -1,0 +1,4 @@
+---
+
+kvm_memory: 6291456
+kvm_vcpu: 2

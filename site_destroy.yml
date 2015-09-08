@@ -1,0 +1,26 @@
+---
+- name: Destroy Virtual Machines
+  hosts: kvmhost
+  tasks:
+  - name: destroy domain
+    virt:
+      name: "{{ item }}"
+      command: destroy
+    with_sequence: start=1 end={{ quantity }} format="{{ name_prefix }}%d"
+    ignore_errors: yes
+    
+  - name: undefine domain
+    virt:
+      name: "{{ item }}"
+      command: undefine
+    with_sequence: start=1 end={{ quantity }} format="{{ name_prefix }}%d"
+
+
+  - name: delete backing file
+    file:
+      path: "{{ instance_path}}/{{ item }}.qcow2"
+      state: absent
+    with_sequence: start=1 end={{ quantity }} format="{{ name_prefix }}%d"
+
+
+# vim:ft=ansible:

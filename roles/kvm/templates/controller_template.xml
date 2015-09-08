@@ -1,6 +1,5 @@
 <domain type='kvm' id='3'>
- <name>{{kvm_name}}</name>
- <uuid>{{kvm_uuid}}</uuid>
+ <name>{{item}}</name>
  <memory unit='KiB'>{{kvm_memory}}</memory>
  <currentMemory unit='KiB'>{{kvm_memory}}</currentMemory>
  <vcpu placement='static'>{{kvm_vcpu}}</vcpu>
@@ -35,7 +34,7 @@
    <emulator>/usr/libexec/qemu-kvm</emulator>
    <disk type='file' device='disk'>
      <driver name='qemu' type='qcow2'/>
-     <source file='/var/lib/libvirt/images/rhel7.0.qcow2'/>
+     <source file='{{ instance_path }}/{{ item }}.qcow2'/>
      <backingStore/>
      <target dev='vda' bus='virtio'/>
      <alias name='virtio-disk0'/>
@@ -79,29 +78,14 @@
      <alias name='virtio-serial0'/>
      <address type='pci' domain='0x0000' bus='0x00' slot='0x08' function='0x0'/>
    </controller>
-   <interface type='network'>
-     <mac address='{{kvm_mac_1}}'/>
-     <source network='default' bridge='br-pxe'/>
-     <target dev='vnic0'/>
-     <model type='virtio'/>
-     <alias name='pxe'/>
-     <address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'/>
+   <interface type='bridge'>
+     <source bridge='bridge0' />
    </interface>
-   <interface type='network'>
-     <mac address='{{kvm_mac_2}}'/>
-     <source network='default' bridge='virbr1'/>
-     <target dev='vnic1'/>
-     <model type='virtio'/>
-     <alias name='bond0'/>
-     <address type='pci' domain='0x0000' bus='0x00' slot='0x04' function='0x0'/>
+   <interface type='bridge'>
+     <source bridge='bridge1' />
    </interface>
-   <interface type='network'>
-     <mac address='{{kvm_mac_3}}'/>
-     <source network='default' bridge='virbr2'/>
-     <target dev='vnic2'/>
-     <model type='virtio'/>
-     <alias name='bond0'/>
-     <address type='pci' domain='0x0000' bus='0x00' slot='0x05' function='0x0'/>
+   <interface type='bridge'>
+     <source bridge='bridge2' />
    </interface>
    <serial type='pty'>
      <source path='/dev/pts/2'/>
@@ -113,9 +97,9 @@
      <target type='serial' port='0'/>
      <alias name='serial0'/>
    </console>
-   <channel type='spicevmc'>
-     <target type='virtio' name='com.redhat.spice.0' state='disconnected'/>
-     <alias name='channel0'/>
+   <channel type='unix'>
+     <source mode='bind' path='/var/lib/libvirt/qemu/channel/target/rhel7.0.org.qemu.guest_agent.0'/>
+     <target type='virtio' name='org.qemu.guest_agent.0'/>
      <address type='virtio-serial' controller='0' bus='0' port='1'/>
    </channel>
    <input type='tablet' bus='usb'>
@@ -123,8 +107,8 @@
    </input>
    <input type='mouse' bus='ps2'/>
    <input type='keyboard' bus='ps2'/>
-   <graphics type='spice' port='5901' autoport='yes' listen='127.0.0.1'>
-     <listen type='address' address='127.0.0.1'/>
+   <graphics type='spice'  autoport='yes' listen='0.0.0.0'>
+     <listen type='address' address='0.0.0.0'/>
    </graphics>
    <video>
      <model type='qxl' ram='65536' vram='65536' vgamem='16384' heads='1'/>

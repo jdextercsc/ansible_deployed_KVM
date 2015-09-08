@@ -33,8 +33,10 @@
     - libvirt
     - libguestfs
     - virt-install
-    - "bridge-utils"
-    - "net-tools"
+    - bridge-utils
+    - net-tools
+    - libguestfs-tools
+    - qemu-guest-agent
   tags: kvm
 
 - name: install base rpms

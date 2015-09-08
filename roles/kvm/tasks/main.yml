@@ -1,12 +1,16 @@
 ---
 
-# - name: Restart Network
-#   # Restart the network, sleep 3 seconds, return the
-#   # exit code returned by "service network restart".
-#   # This is to work-around a glitch in Ansible where
-#   # it detects a successful network restart as a failure.
-#   command: perl -e 'my $exit_code = system("service network restart"); sleep 3; $exit_code = $exit_code >> 8; exit($exit_code);'
+- name: create instance_path
+  file:
+    dest: "{{instance_path}}"
+    state: directory
+    owner: qemu
+    group: qemu
+
+- name: get new file
+  get_url:
+    dest: "{{ instance_path }}/rhel7.qcow2"
+    url: http://192.168.11.1:8120/rhel7.1-guest.qcow2
 
 
-
-#assume that network intefaces have bridges made for them.
+- include: domains.yml
